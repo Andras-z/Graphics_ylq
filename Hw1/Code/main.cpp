@@ -23,9 +23,15 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
 
-    // TODO: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
-    // Then return it.
+    Eigen::Matrix4f translate;
+    float angle = rotation_angle / 180.0 * MY_PI;
+
+    translate << std::cos(angle), -std::sin(angle), 0, 0,
+                 std::sin(angle), std::cos(angle), 0, 0,
+                 0, 0, 1, 0,
+                 0, 0, 0, 1;
+    model = translate * model;
 
     return model;
 }
@@ -36,10 +42,35 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     // Students will implement this function
 
     Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f M_ortho_scale; // 将方块长宽高全变成2
+    Eigen::Matrix4f M_ortho_trans; // 将方块中心移到原点
+    Eigen::Matrix4f M_persp2ortho; // 透视->正交的“挤压”矩阵”
 
-    // TODO: Implement this function
     // Create the projection matrix for the given parameters.
-    // Then return it.
+    float r, l, t, b;
+    float angle = eye_fov / 180.0 * MY_PI;
+
+    t = zNear * std::tan(angle / 2); // half angle
+    r = t * aspect_ratio;
+    l = -r;
+    b = -t;
+
+    M_ortho_scale << 2 / (r - l), 0, 0, 0,
+                     0, 2 / (t - b), 0, 0,
+                     0, 0, 2 / (zNear - zFar), 0,
+                     0, 0, 0, 1;
+
+    M_ortho_trans << 1, 0, 0, - (r + l) / 2,
+                     0, 1, 0, - (t + b) / 2,
+                     0, 0, 1, - (zNear + zFar) / 2,
+                     0, 0, 0, 1;
+
+    M_persp2ortho << zNear, 0, 0, 0,
+                     0, zNear, 0, 0,
+                     0, 0, zNear + zFar, -zNear * zFar,
+                     0, 0, 1, 0;
+
+    projection = M_ortho_scale * M_ortho_trans * M_persp2ortho;
 
     return projection;
 }
