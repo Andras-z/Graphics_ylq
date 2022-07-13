@@ -299,22 +299,22 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                 // set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
                 if (z_interpolated < depth_buf[get_index(x, y)]) {
                     // color 
-					auto interpolated_color = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1);
-					// normal
-					auto interpolated_normal = interpolate(alpha, beta, gamma, t.normal[0], t.normal[1], t.normal[2], 1).normalized();
-					// texture
-					auto interpolated_texcoords = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1);
-					// shadingcoords
-					auto interpolated_shadingcoords = interpolate(alpha, beta, gamma, view_pos[0], view_pos[1], view_pos[2], 1);
+                    auto interpolated_color = interpolate(alpha, beta, gamma, t.color[0], t.color[1], t.color[2], 1);
+                    // normal
+                    auto interpolated_normal = interpolate(alpha, beta, gamma, t.normal[0], t.normal[1], t.normal[2], 1).normalized();
+                    // texture
+                    auto interpolated_texcoords = interpolate(alpha, beta, gamma, t.tex_coords[0], t.tex_coords[1], t.tex_coords[2], 1);
+                    // shadingcoords
+                    auto interpolated_shadingcoords = interpolate(alpha, beta, gamma, view_pos[0], view_pos[1], view_pos[2], 1);
 
-					// 用来传递插值结果的结构体
-					fragment_shader_payload payload(interpolated_color, interpolated_normal, interpolated_texcoords, texture ? &*texture : nullptr); 
-					payload.view_pos = interpolated_shadingcoords;
-					auto pixel_color = fragment_shader(payload);
-					// 设置深度
-					depth_buf[get_index(x, y)] = z_interpolated;
-					// 设置颜色
-					set_pixel(Eigen::Vector2i(x, y), pixel_color);
+                    // 用来传递插值结果的结构体
+                    fragment_shader_payload payload(interpolated_color, interpolated_normal, interpolated_texcoords, texture ? &*texture : nullptr); 
+                    payload.view_pos = interpolated_shadingcoords;
+                    auto pixel_color = fragment_shader(payload);
+                    // 设置深度
+                    depth_buf[get_index(x, y)] = z_interpolated;
+                    // 设置颜色
+                    set_pixel(Eigen::Vector2i(x, y), pixel_color);
                 }
             }
         }
